@@ -1,6 +1,9 @@
-
 import java.util.Scanner;
+import collections.ApplicationManager;
+import models.Citizen;
+import Services.*;
 
+import Exceptions.ApplicationNotFoundException;
 
 public class Main {
 
@@ -10,10 +13,7 @@ public class Main {
         ApplicationManager manager = new ApplicationManager();
 
         while (true) {
-
-            System.out.println("---------------------------------");
-            System.out.println(" DIGITAL GOVERNMENT SERVICE SYSTEM ");
-            System.out.println("---------------------------------");
+            System.out.println("\n =====Welcome to our DIGITAL GOVERNMENT SERVICE SYSTEM =====");
             System.out.println("1. Add New Application");
             System.out.println("2. Approve Application");
             System.out.println("3. Reject Application");
@@ -27,20 +27,17 @@ public class Main {
             input.nextLine();
 
             if (choice == 7) {
-                manager.saveToFile();
                 System.out.println("Goodbye!");
                 break;
             }
 
             switch (choice) {
-                case 1:
 
+                case 1:
                     System.out.print("Enter Citizen ID: ");
                     String citizenId = input.nextLine();
-
                     System.out.print("Enter Citizen Name: ");
                     String name = input.nextLine();
-
                     System.out.print("Enter Phone: ");
                     String phone = input.nextLine();
 
@@ -50,18 +47,12 @@ public class Main {
                     System.out.println("1. Birth Certificate");
                     System.out.println("2. Driving Test");
                     System.out.print("Choice: ");
-
                     int serviceChoice = input.nextInt();
                     input.nextLine();
 
                     GovernmentService service = null;
-
-                    if (serviceChoice == 1) {
-                        service = new BirthCertification();
-                    }
-                    else if (serviceChoice == 2) {
-                        service = new DrivingTestService();
-                    }
+                    if (serviceChoice == 1) service = new BirthCertification();
+                    else if (serviceChoice == 2) service = new DrivingTestService();
                     else {
                         System.out.println("Invalid service.");
                         break;
@@ -70,59 +61,52 @@ public class Main {
                     System.out.print("Enter Application ID: ");
                     String appId = input.nextLine();
 
-                    ServiceApplication app =
-                            new ServiceApplication(
-                                    appId,
-                                    citizen.getName(),
-                                    service.getServiceName(),
-                                    service.getServiceFee()
-                            );
-
+                    ServiceApplication app = new ServiceApplication(appId, citizen, service);
                     manager.addApplication(app);
-
                     System.out.println("Application added successfully!");
                     break;
 
                 case 2:
                     try {
                         System.out.print("Enter Application ID: ");
-                        manager.approveApplication(input.nextLine());
-                    }
-                    catch (ApplicationNotFoundException |
-                           InvalidStatusTransitionException e) {
+                        String approveId = input.nextLine();
+                        manager.approveApplication(approveId);
+                        Thread.sleep(1000);
+                    } catch (ApplicationNotFoundException e) {
                         System.out.println(e.getMessage());
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
                     }
                     break;
-
 
                 case 3:
                     try {
                         System.out.print("Enter Application ID: ");
-                        manager.rejectApplication(input.nextLine());
-                    }
-                    catch (ApplicationNotFoundException |
-                           InvalidStatusTransitionException e) {
+                        String rejectId = input.nextLine();
+                        manager.rejectApplication(rejectId);
+                        Thread.sleep(1000);
+                    } catch (ApplicationNotFoundException e) {
                         System.out.println(e.getMessage());
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
                     }
                     break;
 
                 case 4:
                     try {
                         System.out.print("Enter Application ID: ");
-                        ServiceApplication found =
-                                manager.findApplicationById(input.nextLine());
+                        ServiceApplication found = manager.findApplicationById(input.nextLine());
                         found.display();
-                    }
-                    catch (ApplicationNotFoundException e) {
+                    } catch (ApplicationNotFoundException e) {
                         System.out.println(e.getMessage());
                     }
                     break;
 
-
                 case 5:
                     manager.displayAllApplications();
                     break;
-                case 6:
+
+                case 6: 
                     manager.generateRevenueReport();
                     System.out.println("Revenue report generated.");
                     break;
